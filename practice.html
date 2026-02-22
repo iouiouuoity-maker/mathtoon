@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Жаттығу • MathToon</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <div class="brand"><div class="logo"></div><div><h1>MathToon</h1><small id="crumb">Жаттығу</small></div></div>
+      <div class="pills">
+        <a class="pill" id="back" href="#">⬅️</a>
+        <button class="pill" onclick="window.print()">🖨️</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <section class="hero">
+      <div class="sparkles"></div>
+      <h2 id="title">Жаттығу</h2>
+      <p>Тапсырманы орындап, соңында “Тексеру” бас.</p>
+    </section>
+
+    <div class="grid">
+      <div class="card span6">
+        <h3>👧 Оқушы</h3>
+        <input id="name" class="input" placeholder="Атың (мыс: Аружан)"/>
+        <div class="badges">
+          <span class="badge" id="lvlBadge">L1</span>
+          <span class="badge" id="topicBadge"></span>
+        </div>
+      </div>
+
+      <div class="card span6">
+        <h3>⭐ Нәтиже</h3>
+        <div id="score" class="notice">Әзірге тексерілген жоқ.</div>
+        <div id="stars"></div>
+        <button class="btn g" id="check" style="margin-top:10px">✅ Тексеру</button>
+      </div>
+
+      <div class="card">
+        <h3>🧩 Тапсырмалар</h3>
+        <div id="list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {params, qs, getTopic} from "./assets/app.js";
+
+    const {g, tid, lvl} = params();
+    qs("#crumb").textContent = `${g}-сынып • ${lvl}`;
+    qs("#back").href = `topic.html?g=${g}&tid=${tid}`;
+    qs("#lvlBadge").textContent = lvl;
+
+    const topic = getTopic(g, tid);
+    qs("#title").textContent = `${topic?.title || tid} • ${lvl}`;
+    qs("#topicBadge").textContent = `Тақырып: ${tid}`;
+
+    const tasks = topic?.levels?.[lvl] || [];
+    const stickers = ["st1","st2","st3","st4"];
+
+    if(!tasks.length){
+      qs("#list").innerHTML = `<div class="notice">Бұл деңгейге тапсырма әлі қосылмаған.</div>`;
+    } else {
+      qs("#list").innerHTML = tasks.map((t,i)=>`
+        <div class="kid" style="flex:1 1 100%">
+          <div class="sticker ${stickers[i%4]}">${i+1}</div>
+          <strong>${t.q}</strong>
+          <input class="input ans" data-i="${i}" placeholder="Жауап"/>
+        </div>
+      `).join("");
+    }
+
+    qs("#check").onclick = ()=>{
+      const inputs = [...document.querySelectorAll(".ans")];
+      let ok = 0;
+      inputs.forEach((inp, i)=>{
+        const got = (inp.value||"").trim().toLowerCase();
+        const need = String(tasks[i].a).trim().toLowerCase();
+        if(got === need) ok++;
+      });
+
+      const total = tasks.length || 0;
+      const stars = total ? Math.max(0, Math.min(5, Math.round((ok/total)*5))) : 0;
+
+      qs("#score").textContent = `Нәтиже: ${ok}/${total}`;
+      qs("#stars").innerHTML = `<div class="starbar">${"⭐".repeat(stars)}</div>`;
+    };
+  </script>
+</body>
+</html>
