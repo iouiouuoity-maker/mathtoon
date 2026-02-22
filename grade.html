@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Сынып • MathToon</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <div class="brand"><div class="logo"></div><div><h1>MathToon</h1><small id="sub">Сынып</small></div></div>
+      <div class="pills">
+        <a class="pill" href="index.html">🏠 Басты бет</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <section class="hero">
+      <div class="sparkles"></div>
+      <h2 id="title">Сынып</h2>
+      <p>Тақырыпты таңда: әр тақырыпта тапсырма бар.</p>
+    </section>
+
+    <div class="grid">
+      <div class="card">
+        <h3>🧩 Тақырыптар</h3>
+        <div id="topics" class="kids"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {params, qs, getGrade} from "./assets/app.js";
+
+    const {g} = params();
+    const gr = getGrade(g);
+
+    qs("#title").textContent = `${g}-сынып`;
+    qs("#sub").textContent = `${g}-сынып • тақырыптар`;
+
+    const stickers = ["st1","st2","st3","st4"];
+    qs("#topics").innerHTML = (gr?.topics || []).map((t,i)=>`
+      <a class="kid" href="topic.html?g=${g}&tid=${t.id}">
+        <div class="sticker ${stickers[i%4]}">★</div>
+        <strong>${t.title}</strong>
+        <small>${t.section}</small>
+      </a>
+    `).join("");
+  </script>
+</body>
+</html>
